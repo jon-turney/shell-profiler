@@ -8,7 +8,7 @@ def trace():
   popen = subprocess.Popen(["/bin/bash"], bufsize=1, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
   code = open(sys.argv[1],'r').read()
 
-  popen.stdin.write("set %s;" % ' '.join(sys.argv[1:]))
+  popen.stdin.write("set %s;" % ' '.join(sys.argv[2:]))
   popen.stdin.write("export PS4='>:`date +%s.%N`:$0:line $LINENO:'; set -x;")
   popen.stdin.write(code)
   popen.stdin.write("echo --- END OF PROFILING ---")
@@ -59,9 +59,7 @@ if __name__ == '__main__':
     print "e.g.: %s /some/path/script.sh param1 param2" % sys.argv[0]
     exit(1)
 
-  tmp_tokens = [line.split(":") for line in trace()]
-  tokenized_trace = [tmp[:4] + [':'.join(tmp[4:])] for tmp in tmp_tokens] #to recombine code lines that actually contain semi-colons
-
+  tokenized_trace = [line.split(":", 5) for line in trace() if line.startswith('>')]
   profiling_with_timings = map(collect_timings, tokenized_trace, range(len(tokenized_trace)))
   consolidated_timings_by_line = consolidate_timings_by_line(profiling_with_timings)
 

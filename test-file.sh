@@ -7,3 +7,4 @@ for i in `seq 100`; do
 		echo "loop: $i"
 done
 echo c;
+echo c 1>&2;
